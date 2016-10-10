@@ -36,6 +36,7 @@ export default class Messages extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        this.props.fetchMessagesIfNeeded();
         this.setState({
             messagesDataSource: this.state.messagesDataSource.cloneWithRows(nextProps.messages)
         });
@@ -83,7 +84,11 @@ export default class Messages extends Component {
                     <Text style = {[styles.goNextButtonText]}>Go Back To Users ></Text>
                 </TouchableHighlight>
                 <TouchableHighlight underlayColor = "#56a570" style = {[styles.signInButton]}
-                                    onPress = {this.props.loadMessages}>
+                                    onPress = {()=>
+                                    {
+                                        this.props.invalidateMessageList();
+                                        this.props.fetchMessagesIfNeeded();
+                                    }}>
                     <Text style = {[styles.signInButtonText]}>LOAD MESSAGES</Text>
                 </TouchableHighlight>
                 <Text style = {[styles.labelText]}>Message input:</Text>
@@ -92,7 +97,7 @@ export default class Messages extends Component {
                                onChangeText = {(messageText) => this.setState({messageText})}></TextInput>
                 </View>
                 <TouchableHighlight underlayColor = "#b2e3f7" style = {[styles.signInButton]}
-                                    onPress = {() => {this.props.sendMessage(this.state.messageText);}}>
+                                    onPress = {() => {this.props.sendMessageUI(this.state.messageText);}}>
                     <Text style = {[styles.signInButtonText]}>Send Message</Text>
                 </TouchableHighlight>
                 <ScrollView>

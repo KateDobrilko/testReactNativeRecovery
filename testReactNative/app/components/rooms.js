@@ -27,7 +27,6 @@ export default class Rooms extends Component {
 
     componentDidMount() {
         console.log(this.props.connectWebsockets);
-        this.props.loadRooms();
         this.props.connectWebsockets();
         InteractionManager.runAfterInteractions(() => {
             this.setState({renderPlaceholderOnly: false});
@@ -35,6 +34,7 @@ export default class Rooms extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        this.props.fetchRoomsIfNeeded();
         this.setState({
             roomsDataSource: this.state.roomsDataSource.cloneWithRows(nextProps.rooms)
         });
@@ -66,7 +66,7 @@ export default class Rooms extends Component {
 
     _renderRow(rowData) {
         return (<TouchableOpacity onPress = {() => {
-                        this.props.openChatRoom(rowData.id);
+                        this.props.selectRoom(rowData);
                         this.navMessages();}}
                                   style = {[styles.listRow]}>
             <View style = {{flex: 1, justifyContent: 'center', paddingLeft: 10, paddingRight: 10}}>
@@ -96,7 +96,11 @@ export default class Rooms extends Component {
                     <Text style = {[styles.goNextButtonText]}>Go To Users ></Text>
                 </TouchableHighlight>
                 <TouchableHighlight underlayColor = "#56a570" style = {[styles.signInButton]}
-                                    onPress = {this.props.loadRooms.bind(this)}>
+                                    onPress = {()=>
+                                    {
+                                        this.props.invalidateRoomList();
+                                        this.props.fetchRoomsIfNeeded();
+                                    }}>
                     <Text style = {[styles.signInButtonText]}>LOAD ROOMS</Text>
                 </TouchableHighlight>
                 <ScrollView>

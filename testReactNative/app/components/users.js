@@ -34,9 +34,12 @@ export default class Users extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({
-            usersDataSource: this.state.usersDataSource.cloneWithRows(nextProps.users)
-        });
+        this.props.fetchUsersIfNeeded();
+        if (nextProps.users.length != 0) {
+            this.setState({
+                usersDataSource: this.state.usersDataSource.cloneWithRows(nextProps.users)
+            });
+        }
     }
 
     navMessages(roomId) {
@@ -66,7 +69,7 @@ export default class Users extends Component {
 
     _renderRow(rowData) {
         return (<TouchableOpacity onPress = {() => {
-                                  this.props.openChatRoom(rowData.privateRoomId);
+                                  this.props.selectUser(rowData);
                                   this.navMessages();}}
                                   style = {{flexDirection:'row', flexWrap:'wrap', height:120,borderBottomColor: '#ededed', borderBottomWidth:1, paddingLeft:10, paddingTop:10}}>
             <View style = {{justifyContent: 'flex-start'}}>
@@ -96,7 +99,11 @@ export default class Users extends Component {
                     <Text style = {[styles.goNextButtonText]}>Go To Rooms ></Text>
                 </TouchableHighlight>
                 <TouchableHighlight underlayColor = "#56a570" style = {[styles.signInButton]}
-                                    onPress = {this.props.loadUsers}>
+                                    onPress = {()=>
+                                    {
+                                        this.props.invalidateUserList();
+                                        this.props.fetchUsersIfNeeded();
+                                    }}>
                     <Text style = {[styles.signInButtonText]}>LOAD USERS</Text>
                 </TouchableHighlight>
                 <ScrollView>

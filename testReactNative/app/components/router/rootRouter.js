@@ -8,8 +8,8 @@ import Rooms from '../rooms';
 
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import * as actions from '../../actions/actions';
 
+import * as actions from '../../actions/actions';
 
 class RootRouter extends Component {
     render() {
@@ -29,6 +29,7 @@ class RootRouter extends Component {
         }
     }
 
+
     isAuthorized() {
         return AsyncStorage.getItem('X-AUTH-TOKEN') ? true : false;
 
@@ -36,6 +37,7 @@ class RootRouter extends Component {
 
     renderScene(route, navigator) {
         const {state, actions} = this.props;
+        console.log(state);
         var routeId = route.id;
         if (routeId === 'Login') {
             return (
@@ -46,7 +48,7 @@ class RootRouter extends Component {
         if (routeId === 'Users') {
             console.log(state);
             return (
-                <Users roomId = {state.currentRoomId}
+                <Users roomId = {state.selectedChatRoom}
                        users = {state.users}
                        navigator = {navigator}  {...actions}/>
             );
@@ -54,7 +56,7 @@ class RootRouter extends Component {
         if (routeId === 'Rooms') {
             return (
                 <Rooms
-                    roomId = {state.currentRoomId}
+                    roomId = {state.selectedChatRoom}
                     rooms = {state.rooms}
                     navigator = {navigator}  {...actions} />
             );
@@ -68,9 +70,47 @@ class RootRouter extends Component {
     }
 }
 
-export default connect(state => ({
-        state: state.RootReducer
-    }),
+function mapStateToProps(state) {
+    console.log(state);
+    const {selectedChatRoom} = state;
+
+    const {
+        userListIsFetching,
+        userListDidInvalidate,
+        userListItems
+
+    } = state.users;
+    const {
+        messageListIsFetching,
+        messageListDidInvalidate,
+        messageListItems
+
+    } = state.messages;
+
+    const {
+        roomListIsFetching,
+        roomListDidInvalidate,
+        roomListItems
+
+    } = state.rooms;
+
+
+
+    return {
+        selectedChatRoom,
+        userListIsFetching,
+        userListDidInvalidate,
+        userListItems,
+        messageListIsFetching,
+        messageListDidInvalidate,
+        messageListItems,
+        roomListIsFetching,
+        roomListDidInvalidate,
+        roomListItems
+    };
+}
+
+export default connect(state => mapStateToProps(state),
     (dispatch) => ({
         actions: bindActionCreators(actions, dispatch)
     })
